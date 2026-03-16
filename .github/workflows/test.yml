@@ -78,6 +78,25 @@ jobs:
         run: |
           godot --version
 
+  test-custom-repo:
+    name: 🧪 Test with custom repository
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: 🧾 Checkout
+
+      - uses: ./
+        name: 🤖 Setup Godot from custom repo
+        with:
+          version: 4.6.1-stable-directional-light-projector
+          repository: calfur/godot
+          use-dotnet: true
+
+      - name: 🔬 Verify Godot
+        run: |
+          godot --version
+
   check-dist:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-latest

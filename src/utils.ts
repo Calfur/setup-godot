@@ -147,9 +147,6 @@ interface SemanticVersion {
   label: string
 }
 
-/** Godot download url prefix. */
-const GODOT_URL_PREFIX =
-  'https://github.com/godotengine/godot-builds/releases/download/'
 /** Godot filename prefix. */
 const GODOT_FILENAME_PREFIX = 'Godot_v'
 
@@ -179,13 +176,15 @@ export function parseVersion(version: string): SemanticVersion {
  * @param platform Current platform instance.
  * @param useDotnet True to use the .NET-enabled version of Godot.
  * @param isTemplate True to return the url for the template
+ * @param repository GitHub repository in format `owner/repo` to download from.
  * @returns Godot binary download url.
  */
 export function getGodotUrl(
   versionString: string,
   platform: Platform,
   useDotnet: boolean,
-  isTemplate: boolean
+  isTemplate: boolean,
+  repository: string
 ): string {
   const version = parseVersion(versionString)
   const major = version.major
@@ -193,16 +192,18 @@ export function getGodotUrl(
   const patch = version.patch
   const label = version.label.replace('.', '')
 
-  let url = `${GODOT_URL_PREFIX + major}.${minor}`
+  let tag = `${major}.${minor}`
   if (patch !== '' && patch !== '0') {
-    url += `.${patch}`
+    tag += `.${patch}`
   }
 
   if (label !== '') {
-    url += `-${label}/`
+    tag += `-${label}`
   } else {
-    url += '-stable/'
+    tag += '-stable'
   }
+
+  const url = `https://github.com/${repository}/releases/download/${tag}/`
 
   if (!isTemplate)
     return `${url}${getGodotFilename(version, platform, useDotnet)}.zip`

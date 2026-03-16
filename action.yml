@@ -70,6 +70,13 @@ inputs:
     description: >-
       True to cache downloads.
     default: true
+  repository:
+    description: >-
+      GitHub repository to download Godot from, in the format `owner/repo`.
+      Defaults to `godotengine/godot-builds` for official builds.
+      For custom builds, specify the repository where releases are hosted.
+      Example: `calfur/godot`
+    default: 'godotengine/godot-builds'
 runs:
   using: 'node24'
   main: 'dist/index.js'

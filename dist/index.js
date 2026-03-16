@@ -61604,7 +61604,6 @@ var MacOS = class {
     return path13.join(installationDir, `Godot${useDotnet ? "_mono" : ""}.app`);
   }
 };
-var GODOT_URL_PREFIX = "https://github.com/godotengine/godot-builds/releases/download/";
 var GODOT_FILENAME_PREFIX = "Godot_v";
 var SEMANTIC_VERSION_REGEX = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
 function parseVersion(version3) {
@@ -61618,21 +61617,22 @@ function parseVersion(version3) {
   const label = match2[4] || "";
   return { major, minor, patch, label };
 }
-function getGodotUrl(versionString, platform3, useDotnet, isTemplate) {
+function getGodotUrl(versionString, platform3, useDotnet, isTemplate, repository) {
   const version3 = parseVersion(versionString);
   const major = version3.major;
   const minor = version3.minor;
   const patch = version3.patch;
   const label = version3.label.replace(".", "");
-  let url2 = `${GODOT_URL_PREFIX + major}.${minor}`;
+  let tag = `${major}.${minor}`;
   if (patch !== "" && patch !== "0") {
-    url2 += `.${patch}`;
+    tag += `.${patch}`;
   }
   if (label !== "") {
-    url2 += `-${label}/`;
+    tag += `-${label}`;
   } else {
-    url2 += "-stable/";
+    tag += "-stable";
   }
+  const url2 = `https://github.com/${repository}/releases/download/${tag}/`;
   if (!isTemplate)
     return `${url2}${getGodotFilename(version3, platform3, useDotnet)}.zip`;
   return `${url2}${getGodotFilenameBase(version3)}${useDotnet ? "_mono" : ""}_export_templates.tpz`;
@@ -61751,6 +61751,7 @@ async function run(platform3) {
   const checkoutDirectory = process4.env["GITHUB_WORKSPACE"] ?? "";
   const includeTemplates = getBooleanInput("include-templates");
   const useCache = getBooleanInput("cache");
+  const repository = getInput("repository").replace(/\s/g, "");
   const userDir = os9.homedir();
   const downloadsDir = import_path.default.join(userDir, downloadsRelativePath);
   const installationDir = import_path.default.join(userDir, pathRelative);
@@ -61784,7 +61785,7 @@ async function run(platform3) {
     platform3,
     useDotnet
   );
-  const godotUrl = getGodotUrl(version3, platform3, useDotnet, false);
+  const godotUrl = getGodotUrl(version3, platform3, useDotnet, false, repository);
   const godotDownloadPath = import_path.default.join(downloadsDir, `${versionName}.zip`);
   const godotInstallationPath = platform3.getUnzippedPath(
     installationDir,
@@ -61792,11 +61793,12 @@ async function run(platform3) {
     useDotnet
   );
   const binDir = import_path.default.join(userDir, binRelativePath);
-  const exportTemplateUrl = includeTemplates ? getGodotUrl(version3, platform3, useDotnet, true) : "";
+  const exportTemplateUrl = includeTemplates ? getGodotUrl(version3, platform3, useDotnet, true, repository) : "";
   const exportTemplatePath = includeTemplates ? getExportTemplatePath(version3, platform3, useDotnet) : "";
   const exportTemplateDownloadPath = includeTemplates ? import_path.default.join(downloadsDir, "export_templates.zip") : "";
   info(`\u{1F916} Godot version: ${version3}`);
   info(`\u{1F916} Godot version name: ${versionName}`);
+  info(`\u{1F4E6} Repository: ${repository}`);
   info(`\u{1F7E3} Use .NET: ${useDotnet}`);
   info(`\u{1F916} Godot download url: ${godotUrl}`);
   info(`\u{1F9D1}\u200D\u{1F4BC} User directory: ${userDir}`);

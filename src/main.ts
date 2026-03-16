@@ -29,6 +29,7 @@ async function run(platform: Platform): Promise<void> {
   const checkoutDirectory = process.env['GITHUB_WORKSPACE'] ?? ''
   const includeTemplates = core.getBooleanInput('include-templates')
   const useCache = core.getBooleanInput('cache')
+  const repository = core.getInput('repository').replace(/\s/g, '')
 
   const userDir = os.homedir()
   const downloadsDir = path.join(userDir, downloadsRelativePath)
@@ -69,7 +70,7 @@ async function run(platform: Platform): Promise<void> {
     platform,
     useDotnet
   )
-  const godotUrl = getGodotUrl(version, platform, useDotnet, false)
+  const godotUrl = getGodotUrl(version, platform, useDotnet, false, repository)
   const godotDownloadPath = path.join(downloadsDir, `${versionName}.zip`)
   const godotInstallationPath = platform.getUnzippedPath(
     installationDir,
@@ -79,7 +80,7 @@ async function run(platform: Platform): Promise<void> {
   const binDir = path.join(userDir, binRelativePath)
 
   const exportTemplateUrl = includeTemplates
-    ? getGodotUrl(version, platform, useDotnet, true)
+    ? getGodotUrl(version, platform, useDotnet, true, repository)
     : ''
   const exportTemplatePath = includeTemplates
     ? getExportTemplatePath(version, platform, useDotnet)
@@ -90,6 +91,7 @@ async function run(platform: Platform): Promise<void> {
 
   core.info(`🤖 Godot version: ${version}`)
   core.info(`🤖 Godot version name: ${versionName}`)
+  core.info(`📦 Repository: ${repository}`)
   core.info(`🟣 Use .NET: ${useDotnet}`)
   core.info(`🤖 Godot download url: ${godotUrl}`)
   core.info(`🧑‍💼 User directory: ${userDir}`)
