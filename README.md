@@ -46,13 +46,13 @@ jobs:
         # Use bash shells on all platforms.
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         name: 🧾 Checkout
         # Disable fetching history as most of the time it is useless
         filter: tree:0
         fetch-depth: 0
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         name: 💽 Setup .NET SDK
         with:
           # Use the .NET SDK from global.json in the root of the repository.
