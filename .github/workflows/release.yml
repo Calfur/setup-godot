@@ -52,7 +52,8 @@ jobs:
       - name: 🔎 Read Current Project Version
         id: current-version
         run: |
-          echo "tag=$(git tag --sort=v:refname | grep -E '^v[0-9]' | tail -1)" >> "$GITHUB_OUTPUT"
+          tag=$(git tag --sort=v:refname | grep -E '^v[0-9]' | tail -1)
+          echo "tag=${tag:-v0.0.0}" >> "$GITHUB_OUTPUT"
 
       - name: 🖨 Print Current Version
         run: |
